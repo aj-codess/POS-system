@@ -5,9 +5,9 @@ const admin_auth=express.Router();
 
 admin_auth.all("*",(req,res,next)=>{
 
-    if(!req.cookies[auth_token]){
+    if(!req.cookies && req.url.includes("login")){
 
-        return res.status(403).json({ message: `Missing required cookie! Re-login`});
+        next();
 
     };
 
@@ -22,7 +22,7 @@ admin_auth.all("*",(req,res,next)=>{
         next();
     };
 
-    res.json(isValid_obj);
+    return res.status(403).json({ message: `Missing required cookie! Re-login`});
 
 });
 

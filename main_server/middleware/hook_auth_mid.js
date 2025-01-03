@@ -22,6 +22,8 @@ hook_auth.all("*",(req,res,next)=>{
 
             res.cookie('auth_token', cookie_obj.cookie, cookieOptions);
 
+            next();
+
         } else{
 
             res.send(cookie_obj);
