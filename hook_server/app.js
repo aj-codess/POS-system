@@ -63,6 +63,9 @@ ws.on("connection",(ws)=>{
 });
 
 
+console.log(`WebSocket server is running on ws://localhost:${WS_PORT}`);
+
+
 
 
 //excute what ever within the queue of a csh id
