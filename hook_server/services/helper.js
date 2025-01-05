@@ -12,7 +12,7 @@ const gen_id=()=>{
 };
 
 
-const isCSH=()=>{
+const isCSH=(inputString)=>{
 
     if (typeof inputString !== 'string') {
         return false;
@@ -22,7 +22,7 @@ const isCSH=()=>{
 };
 
 
-const isCLT=()=>{
+const isCLT=(inputString)=>{
 
     if (typeof inputString !== 'string') {
         return false;

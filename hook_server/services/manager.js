@@ -1,17 +1,10 @@
 class socket_info {
     constructor(){
-        this.status="active";
+        this.status="open";
         this.message_queue=new Array();
+        this.CSH_socket_addr=null;
+        this.CLT_socket_addr=null;
     }
-};
-
-
-const target_getter=(id)=>{
-
-    if (id.length > 0) {
-        return id[id.length - 1];
-    };
-
 };
 
 
@@ -24,13 +17,23 @@ class KeyValueStore {
         this.store.set(key,new socket_info());
     }
 
-    set(domain,key,value) {
-        this.store[domain].set(key, value);
+    setCSH_addr(domain,value) {
+
+        this.store.get(domain).CSH_socket_addr=value;
+
     }
 
+
+    setCLT_addr(domain,value){
+
+        this.store.get(domain).CLT_socket_addr=value;
+
+    }
+
+
     get_endpoint_id(end){
-        for(let key in this.store){
-            if(end==target_getter(id)){
+        for(const key of this.store.keys()){
+            if(key.includes(end) && this.store.get(key).status=="open"){
                 return key;
             };
         }
@@ -41,8 +44,8 @@ class KeyValueStore {
     }
 
     getActive(){
-        for(let key in this.store){
-            if(this.store[key].status=="active"){
+        for(const key of this.store.keys()){
+            if(this.store.get(key).status=="open"){
                 return key;
             }
         };
@@ -51,9 +54,17 @@ class KeyValueStore {
 
     push_message(domain,msg){
 
-        this.store[domain].message_queue.push(msg);
+        this.store.get(domain).message_queue.push(msg);
 
     };
+
+    clear_message_queue(domain){
+        this.store.get(domain).message_queue=[];
+    }
+
+    mark_open(domain){
+        this.store.get(domain).status="open";
+    }
 
     get(key) {
         return this.store.get(key);
@@ -65,10 +76,6 @@ class KeyValueStore {
 
     delete(key) {
         return this.store.delete(key);
-    }
-
-    delete_clt(domain){
-        return this.store[domain].delete(CLT_socket_addr);
     }
 
     clear() {

@@ -10,45 +10,119 @@ const WS_PORT=process.env.WS_PORT || 8080;
 
 const ws = new WebSocket.Server({ port: WS_PORT });
 
+let endpoint;
+
+let id;
+
 ws.on("connection",(ws)=>{
 
     ws.on("message",(message)=>{
 
         const payload_in=JSON.parse(message);
 
-        if(payload_in.CSH_id){
+        let endpoint;
 
-            if(!manager.has(CSH_id)){
-                manager.create(CSH_id);
-                manager.set(CSH_id,CSH_socket_addr,ws);
+        id=payload_in.id;
+
+        if(helper.isCSH(payload_in.id)){
+
+            if(!manager.has(payload_in.id)){
+
+                manager.create(payload_in.id);
+
+                manager.setCSH_addr(payload_in.id,ws);
+
             };
 
-        } else if(payload_in.CLT_id){
+            //send awaiting message in message_queue
+            if(manager.get(payload_in.id).message_queue.length>0){
 
-            const endpoint=helper.endpoint_id(payload_in.CLT_id);
+                const assets=manager.get(payload_in.id);
 
-            manager.set(endpoint,CLT_socket_addr,ws);
+                for(let i=0;i<assets.message_queue.length;i++){
+
+                    assets.CSH_socket_addr.send(JSON.stringify(assets.message_queue[i]));
+    
+                };
+
+                manager.clear_message_queue(payload_in);
+
+            };
+
+            manager.push_message(payload_in.id,payload_in.message);
+
+
+
+        } else if(helper.isCLT(payload_in.id)){
+
+            endpoint=helper.endpoint_id(payload_in.id);
+
+            manager.setCLT_addr(endpoint,ws);
+
+            //send awaiting message in message_queue
+            const assets=manager.get(endpoint);
+
+                for(let i=0;i<assets.message_queue.length;i++){
+
+                    assets.CLT_socket_addr.send(JSON.stringify(assets.message_queue[i]));
+    
+                };
+    
+                manager.clear_message_queue(endpoint);
+
 
             manager.push_message(endpoint,payload_in.message);
 
         };
 
+
+    
+        //execute with regards to the message queue
+        if(helper.isCLT(payload_in.id)){
+
+            const assets=manager.get(endpoint);
+
+            if(!assets.CSH_socket_addr == null){
+                for(let i=0;i<assets.message_queue.length;i++){
+
+                    assets.CSH_socket_addr.send(JSON.stringify(assets.message_queue[i]));
+    
+                };
+    
+                manager.clear_message_queue(endpoint);
+            }
+
+        }else if(helper.isCSH(payload_in.id)){
+
+            const assets=manager.get(payload_in.id);
+
+            if(!assets.CLT_socket_addr == null){
+                for(let i=0;i<assets.message_queue.length;i++){
+
+                    assets.CLT_socket_addr.send(JSON.stringify(assets.message_queue[i]));
+    
+                };
+
+                manager.clear_message_queue(payload_in.id);
+            }
+
+
+            if(assets.hasOwnProperty("receipt")){
+                manager.mark_open(payload_in.id);
+            };
+
+        };
+
+
     });
 
 
-
-
-
     ws.on("close",()=>{
-        if(payload_in.CSH_id){
-
-            let isDeleted=manager.delete(payload_in.CSH_id);
+        if(helper.isCSH(id)){
 
             //send a message to the main sever that a cashier machine is down.
 
-        } else if(payload_in.CLT_id){
-
-            let isDeleted = manager.delete_clt(endpoint);
+        } else if(helper.isCLT(id)){
 
             //send a message to the main server that the client machine is down.
 
@@ -58,6 +132,7 @@ ws.on("connection",(ws)=>{
 
     ws.on("error",(error)=>{
         //send what ever error to the admin
+        console.log("an error occured");
     });
 
 });
@@ -66,6 +141,9 @@ ws.on("connection",(ws)=>{
 console.log(`WebSocket server is running on ws://localhost:${WS_PORT}`);
 
 
+//after communication, keep records where recovery can be done
 
+//once receipt is generated, and the client is down, record should be kept and the cashier device should wait on the reconnection
+//of that same client again
 
-//excute what ever within the queue of a csh id
+//once a receipt is generated for a client, cashier status should be changed to open again aside close
