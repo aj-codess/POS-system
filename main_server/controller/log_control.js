@@ -28,6 +28,7 @@ const newAdmin=async (req,res)=>{
                 message: 'Authentication successful',
             });
 
+            //create a db table with the token id
     
         } catch (error) {
 

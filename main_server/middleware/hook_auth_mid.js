@@ -12,7 +12,7 @@ const hook_auth=express.Router();
 
 hook_auth.all("*",(req,res,next)=>{
 
-    if (!req.cookies[auth_token]) {
+    if (req.url=="/hook_module/ping") {
 
         const {token}=req.body;
 
@@ -22,7 +22,7 @@ hook_auth.all("*",(req,res,next)=>{
 
             res.cookie('auth_token', cookie_obj.cookie, cookieOptions);
 
-            next();
+            return next(); 
 
         } else{
 
@@ -30,7 +30,7 @@ hook_auth.all("*",(req,res,next)=>{
 
         }
 
-    } else if(req.cookie[auth_token]){
+    } else if(req.cookies && req.url != "hook_module/ping"){
 
         const cookieData=req.cookies;
 
@@ -40,7 +40,7 @@ hook_auth.all("*",(req,res,next)=>{
     
             req.id=isValid_obj.token_id;
     
-            next();
+            return next();
         };
     
         res.json(isValid_obj);
@@ -52,4 +52,4 @@ hook_auth.all("*",(req,res,next)=>{
 });
 
 
-export default hook_auth
+export default hook_auth;

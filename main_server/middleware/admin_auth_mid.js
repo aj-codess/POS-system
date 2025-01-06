@@ -5,21 +5,23 @@ const admin_auth=express.Router();
 
 admin_auth.all("*",(req,res,next)=>{
 
-    if(!req.cookies && req.url.includes("login")){
+    if(req.url.includes("login")){
 
-        next();
+        return next();
 
-    };
+    } else if(req.cookies){
 
-    const cookieData=req.cookies;
+        const cookieData=req.cookies;
 
-    const isValid_obj=auth_control.cookie_validity(cookieData);
+        const isValid_obj=auth_control.cookie_validity(cookieData);
+    
+        if(isValid_obj.isValid == true){
+    
+            req.id=isValid_obj.token_id;
+    
+            return next();
+        };
 
-    if(isValid_obj.isValid == true){
-
-        req.id=isValid_obj.token_id;
-
-        next();
     };
 
     return res.status(403).json({ message: `Missing required cookie! Re-login`});

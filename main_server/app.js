@@ -20,7 +20,12 @@ app.use(cookieParser(process.env.SECRETE_KEY));
 app.use("/hook_module",hook_auth);
 app.use("/admin",admin_auth);
 
-app.use("/login",log_router) 
+//used in combi with admin
+app.use("/login",log_router);
+
+
+//used in combi with hook_module
+
 
 app.listen(PORT,()=>{
     console.log(`Server is running on http://localhost:${PORT}`);

@@ -1,10 +1,18 @@
 import WebSocket from "ws";
 import dotenv from "dotenv";
 
+import main_server from "./hook_module/entry.js";
 import helper from "./services/helper.js";
 import manager from "./services/manager.js";
 
 dotenv.config();
+
+//specify main server token
+const CONFIG={
+    constructor(){
+        this.token;
+    }
+};
 
 const WS_PORT=process.env.WS_PORT || 8080;
 
@@ -140,6 +148,14 @@ ws.on("connection",(ws)=>{
 
 console.log(`WebSocket server is running on ws://localhost:${WS_PORT}`);
 
+let isHooked=main_server.server_init(CONFIG.token);
+
+if(isHooked){
+    console.log("server hooked");
+} else{
+    console.log("server Unable to hook.....shutting down");
+    process.exit(1);
+};
 
 //after communication, keep records where recovery can be done
 

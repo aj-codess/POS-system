@@ -12,6 +12,7 @@
   "author": "aj-codes",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "generate-unique-id": "^2.0.3",
