@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 import main_server from "./hook_module/entry.js";
 import helper from "./services/helper.js";
 import manager from "./services/manager.js";
+import cache from "./cache.js";
+
+cache.trigger_get_inventory();
 
 dotenv.config();
 

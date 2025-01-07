@@ -3,7 +3,7 @@ import net from "./../global_dcl/base.js";
 const init=async (token)=>{
     try {
 
-        const payload_in=await net.get("/hook_module/ping");
+        const payload_in=await net.get("/ping");
 
         const cookie=payload_in.cookie;
 

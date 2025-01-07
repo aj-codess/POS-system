@@ -1,4 +1,5 @@
 import log_service from "./../services/log_service.js";
+import global_dcl from "./../services/global_dcl.js"
 
 const cookieOptions = {
     httpOnly: true, 
@@ -18,6 +19,8 @@ const newAdmin=async (req,res)=>{
     if (log_mail_checks.isValid !== false && log_pass_checks.isValid !== false) {
         try {
             const token_id = log_service.gen_id();
+
+            global_dcl.push_activeToken(token_id);
     
             const cookie_token = await log_service.sign_token(token_id);
     
@@ -56,6 +59,8 @@ const oldAdmin=async (req,res)=>{
     if(mail_check == true && pass_check == true){
 
         const token_id=log_service.get_id_from_db(email);
+
+        global_dcl.push_activeToken(token_id);
 
         const cookie_token = await log_service.sign_token(user_id);
 
